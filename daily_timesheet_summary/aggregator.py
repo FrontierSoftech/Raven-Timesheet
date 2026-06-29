@@ -51,3 +51,5 @@ def aggregate(rows):
     # convert nested defaultdicts to regular dicts
     clean = {p: {t: dict(e) for t, e in tasks.items()} for p, tasks in summary.items()}
     return {"data": clean, "total": total}
+
+
