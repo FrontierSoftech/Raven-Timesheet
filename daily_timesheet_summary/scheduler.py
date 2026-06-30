@@ -1,6 +1,6 @@
 import frappe
 from .aggregator import fetch_timesheets, aggregate
-from .formatter import format_summary
+from .formatter import format_per_employee_messages
 from .raven import send_message
 from .utils import create_logger
 
@@ -17,9 +17,13 @@ def send_daily_summary():
         summary = aggregate(rows)
         logger.info("Aggregation Completed")
 
-        message = format_summary(summary)
-        send_message(message)
-        logger.info("Notification Sent")
+        messages = format_per_employee_messages(summary)
+        if not messages:
+            send_message("📅 Daily Timesheet Summary\n\n_No timesheets submitted today._")
+        else:
+            for message in messages:
+                send_message(message)
+        logger.info(f"Notifications Sent: {len(messages)}")
 
     except Exception:
         frappe.log_error(frappe.get_traceback(), "Daily Timesheet Summary - Scheduler")
